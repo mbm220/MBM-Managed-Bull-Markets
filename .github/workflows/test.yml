@@ -1,0 +1,42 @@
+name: CI - Test
+
+on:
+  pull_request:
+    branches:
+      - dev  # Trigger on pull requests targeting the dev branch
+  push:
+    branches:
+      - dev  # Optionally trigger on pushes to the dev branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Use the latest version of Ubuntu for the CI runner
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2  # Checkout the code from the repository
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Specify the Node.js version (adjust if needed)
+
+      - name: Install Dependencies
+        run: npm install  # Install project dependencies
+        working-directory: ./backend  # Change to your backend directory if needed
+
+      - name: Run Tests
+        run: npm test  # Run the test command defined in package.json
+        working-directory: ./backend  # Change to your backend directory if needed
+
+      - name: Code Coverage
+        run: npm run coverage  # Optional: Run coverage report if configured
+        working-directory: ./backend  # Change to your backend directory if needed
+
+      - name: Upload Coverage Report
+        if: success()  # Only run this step if previous steps succeeded
+        uses: actions/upload-artifact@v2  # Upload coverage reports as artifacts
+        with:
+          name: coverage-report
+          path: ./backend/coverage/  # Path to coverage reports (adjust if needed)
+
